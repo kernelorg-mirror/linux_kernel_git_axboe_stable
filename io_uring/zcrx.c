@@ -498,9 +498,6 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
 		.mp_priv = ifq,
 	};
 
-	if (ifq->if_rxq == -1)
-		return;
-
 	spin_lock(&ifq->lock);
 	netdev = ifq->netdev;
 	netdev_tracker = ifq->netdev_tracker;
@@ -508,7 +505,8 @@ static void io_close_queue(struct io_zcrx_ifq *ifq)
 	spin_unlock(&ifq->lock);
 
 	if (netdev) {
-		net_mp_close_rxq(netdev, ifq->if_rxq, &p);
+		if (ifq->if_rxq != -1)
+			net_mp_close_rxq(netdev, ifq->if_rxq, &p);
 		netdev_put(netdev, &netdev_tracker);
 	}
 	ifq->if_rxq = -1;
