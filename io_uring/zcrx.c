@@ -775,8 +775,10 @@ static void io_zcrx_ring_refill(struct page_pool *pp,
 		struct net_iov *niov;
 		unsigned niov_idx, area_idx;
 
-		area_idx = rqe->off >> IORING_ZCRX_AREA_SHIFT;
-		niov_idx = (rqe->off & ~IORING_ZCRX_AREA_MASK) >> PAGE_SHIFT;
+		__u64 off = READ_ONCE(rqe->off);
+
+		area_idx = off >> IORING_ZCRX_AREA_SHIFT;
+		niov_idx = (off & ~IORING_ZCRX_AREA_MASK) >> PAGE_SHIFT;
 
 		if (unlikely(rqe->__pad || area_idx))
 			continue;
